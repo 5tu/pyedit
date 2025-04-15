@@ -70,12 +70,12 @@
       background: #555;
       color: #bbb;
     }
-    /* Textarea */
+    /* Textarea (changed font to Arial, sans-serif) */
     #fountainInput {
       flex: 1;
       padding: 1.5cm;
       border: none;
-      font-family: "Courier Prime", Courier, monospace;
+      font-family: Arial, sans-serif;
       font-size: 12pt;
       line-height: 1.2;
       resize: none;
@@ -234,113 +234,95 @@ FADE OUT
         .replace(/_(.+?)_/g, '<span class="italic">$1</span>');
     }
 
-    // Comprehensive Fountain parser covering most syntax as per fountain.io
+    // Comprehensive Fountain parser (same as your last working version)
     function parseFountain(text) {
       const lines = text.split('\n');
       let html = '';
       let inDialog = false;
       let inBoneyard = false;
-
       for (let i = 0; i < lines.length; i++) {
         let raw = lines[i];
-        let line = raw;
-        // Do inline formatting before trimming, but escape after:
-        line = stylize(raw);
+        let line = stylize(raw);
         let trimmed = line.trim();
-
         // Boneyard: ignore lines within /* ... */
         if (trimmed.startsWith('/*')) { inBoneyard = true; continue; }
         if (trimmed.endsWith('*/')) { inBoneyard = false; continue; }
         if (inBoneyard) continue;
-
-        // Blank line: output a break so line numbering stays in sync.
+        // Blank line
         if (trimmed === "") {
           html += '<br>';
           inDialog = false;
           continue;
         }
-
-        // Title Page (assume they are at the very beginning)
+        // Title Page
         if (/^(title|credit|author|draft date|date|contact):/i.test(trimmed)) {
           html += `<div class="title-page">${escapeHTML(trimmed)}</div>`;
           continue;
         }
-        
-        // Section Headers (lines starting with one or more "#")
+        // Section Headers (# ...)
         if (/^#+\s+/.test(trimmed)) {
           html += `<div class="section">${escapeHTML(trimmed.replace(/^#+\s+/, ''))}</div>`;
           inDialog = false;
           continue;
         }
-        
-        // Synopsis (lines starting with "=")
+        // Synopsis (= ...)
         if (/^=\s+/.test(trimmed)) {
           html += `<div class="synopsis">${escapeHTML(trimmed.slice(1).trim())}</div>`;
           inDialog = false;
           continue;
         }
-        
-        // Notes (lines beginning with [[ and ending with ]])
+        // Notes ([[ ... ]])
         if (/^\[\[(.+?)\]\]$/.test(trimmed)) {
           let match = trimmed.match(/^\[\[(.+?)\]\]$/);
           html += `<div class="note">${escapeHTML(match[1])}</div>`;
           inDialog = false;
           continue;
         }
-        
-        // Centered text (lines that start with ">" and end with "<")
+        // Centered text (> ... <)
         if (/^>.*<$/.test(trimmed)) {
           html += `<div class="centered">${escapeHTML(trimmed.slice(1, -1).trim())}</div>`;
           inDialog = false;
           continue;
         }
-        
-        // Page Break (a line of three or more "=")
+        // Page Break (===)
         if (/^={3,}$/.test(trimmed)) {
           html += `<div class="page-break"></div>`;
           inDialog = false;
           continue;
         }
-        
-        // Scene Heading (lines starting with INT./EXT./EST./I/E.)
+        // Scene Heading (INT./EXT./EST./I/E.)
         if (/^(INT\.|EXT\.|EST\.|I\/E\.)/.test(trimmed)) {
           html += `<div class="scene-heading">${escapeHTML(trimmed)}</div>`;
           inDialog = false;
           continue;
         }
-        
         // Transition (e.g., CUT TO:, FADE IN:, FADE OUT:, etc.)
         if (/^(FADE (TO BLACK|IN|OUT)|CUT TO:|DISSOLVE TO:|SMASH CUT TO:|WIPE TO:|TO:)$/.test(trimmed)) {
           html += `<div class="transition">${escapeHTML(trimmed)}</div>`;
           inDialog = false;
           continue;
         }
-        
-        // Character (lines in all uppercase, optionally with (V.O.) or (O.S.), and preceded by a blank line)
+        // Character (all uppercase, optionally with (V.O.) or (O.S.), preceded by a blank line)
         if (/^[A-Z0-9 ()'.\-]+$/.test(trimmed) && (i === 0 || lines[i-1].trim() === "")) {
           html += `<div class="character">${escapeHTML(trimmed)}</div>`;
           inDialog = true;
           continue;
         }
-        
         // Parenthetical (within dialogue)
         if (/^\(.*\)$/.test(trimmed) && inDialog) {
           html += `<div class="parenthetical">${escapeHTML(trimmed)}</div>`;
           continue;
         }
-        
         // Lyrics (lines starting with "~")
         if (/^~/.test(trimmed)) {
           html += `<div class="lyrics">${escapeHTML(trimmed.slice(1).trim())}</div>`;
           continue;
         }
-        
         // Dialogue (if in a dialogue block)
         if (inDialog) {
           html += `<div class="dialogue">${escapeHTML(trimmed)}</div>`;
           continue;
         }
-        
         // Fallback Action
         html += `<div class="action">${escapeHTML(trimmed)}</div>`;
         inDialog = false;
@@ -348,12 +330,12 @@ FADE OUT
       return html || '<div class="action">/* Script preview will appear here */</div>';
     }
 
-    // Update preview pane with parsed Fountain content
+    // Update preview pane
     function updatePreview() {
       preview.innerHTML = parseFountain(input.value);
     }
 
-    // Update line numbers based on number of lines in the textarea
+    // Update line numbers
     function updateLineNumbers() {
       const totalLines = input.value.split('\n').length;
       let numbersHTML = '';
@@ -363,7 +345,7 @@ FADE OUT
       lineNumbers.innerHTML = numbersHTML;
     }
 
-    // Sync scroll positions between input, preview, and line numbers
+    // Sync scroll positions
     function syncScroll() {
       const ratio = input.scrollTop / (input.scrollHeight - input.clientHeight);
       preview.scrollTop = ratio * (preview.scrollHeight - preview.clientHeight);
