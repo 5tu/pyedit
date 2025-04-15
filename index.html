@@ -29,7 +29,7 @@
       overflow-y: auto;
       background: #fff;
       box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
-      line-height: 1.0;
+      line-height: 1.2;
       font-size: 12pt;
       white-space: pre-wrap;
       box-sizing: border-box;
@@ -165,6 +165,12 @@
       text-transform: uppercase;
       color: #aa5500;
     }
+    /* Blank line helper */
+    .blank-line {
+      margin: 0;
+      min-height: 1.2em;
+    }
+    
     body.dark-mode .scene-heading { color: #88bfff; }
     body.dark-mode .action { color: #fff; }
     body.dark-mode .character { color: #ddd; }
@@ -227,19 +233,21 @@ Sometimes I wonder if the dog has it easier.
     const darkModeToggle = document.getElementById('darkModeToggle');
     const lineNumbers = document.getElementById('lineNumbers');
 
-    // Function to parse Fountain text into formatted HTML
+    // Parse Fountain text into formatted HTML blocks.
     function parseFountain(text) {
       const lines = text.split('\n');
       let html = '';
       let inDialogue = false;
       
       for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
+        // Use the raw line (do not trim) so blank lines stay empty.
+        const rawLine = lines[i];
+        const line = rawLine.trim();
         const prevLine = i > 0 ? lines[i-1].trim() : '';
         
-        if (!line) {
-          // Insert a break if not already ending with one, and leave dialogue
-          html += '<br>';
+        if (rawLine === "") {
+          // Use a div with fixed line height for blank lines.
+          html += `<div class="blank-line">&nbsp;</div>`;
           inDialogue = false;
           continue;
         }
@@ -254,8 +262,7 @@ Sometimes I wonder if the dog has it easier.
           html += `<div class="transition">${line.toUpperCase()}</div>`;
           inDialogue = false;
         }
-        // Character (all uppercase, may include numbers and punctuation, 
-        // and preceded by a blank line or at the very start)
+        // Character (all uppercase, may include numbers and punctuation, and preceded by a blank line or at the very start)
         else if (/^[A-Z0-9 .()'’\-]+$/.test(line) && (i === 0 || prevLine === '')) {
           html += `<div class="character">${line}</div>`;
           inDialogue = true;
@@ -268,7 +275,7 @@ Sometimes I wonder if the dog has it easier.
         else if (inDialogue) {
           html += `<div class="dialogue">${line}</div>`;
         }
-        // Otherwise, Action
+        // Otherwise, treat it as Action.
         else {
           html += `<div class="action">${line}</div>`;
           inDialogue = false;
@@ -278,12 +285,12 @@ Sometimes I wonder if the dog has it easier.
       return html || '<div class="action">/* Script preview will appear here */</div>';
     }
 
-    // Update the preview pane with parsed Fountain content
+    // Update the preview pane with parsed Fountain content.
     function updatePreview() {
       preview.innerHTML = parseFountain(input.value);
     }
 
-    // Update the line numbers based on the current value of the textarea
+    // Update line numbers based on the current number of lines in the textarea.
     function updateLineNumbers() {
       const lines = input.value.split('\n').length;
       let numbersHTML = '';
@@ -293,14 +300,14 @@ Sometimes I wonder if the dog has it easier.
       lineNumbers.innerHTML = numbersHTML;
     }
 
-    // Sync scroll positions between input and preview (and line numbers)
+    // Sync scroll positions between textarea, preview, and line numbers.
     function syncScroll() {
       const ratio = input.scrollTop / (input.scrollHeight - input.clientHeight);
       preview.scrollTop = ratio * (preview.scrollHeight - preview.clientHeight);
       lineNumbers.scrollTop = input.scrollTop;
     }
     
-    // Export the Fountain script as a .fountain file
+    // Export the Fountain script as a .fountain file.
     function exportScript() {
       const content = input.value;
       const blob = new Blob([content], { type: 'text/plain' });
@@ -314,7 +321,7 @@ Sometimes I wonder if the dog has it easier.
       URL.revokeObjectURL(url);
     }
     
-    // Import a Fountain script from file
+    // Import a Fountain script from a file.
     function importScript(file) {
       const reader = new FileReader();
       reader.onload = (evt) => {
@@ -325,33 +332,26 @@ Sometimes I wonder if the dog has it easier.
       reader.readAsText(file);
     }
     
-    // Toggle dark mode by adding/removing a class on the body
+    // Toggle dark mode by toggling a class on the body.
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
     }
     
-    // Event Listeners
+    // Event listeners.
     input.addEventListener('input', () => {
       updatePreview();
       updateLineNumbers();
     });
     input.addEventListener('paste', () => {
-      setTimeout(() => { // delay to allow paste to complete
+      setTimeout(() => { // delay to allow paste to complete.
         updatePreview();
         updateLineNumbers();
       }, 0);
     });
     input.addEventListener('scroll', syncScroll);
-    preview.addEventListener('scroll', () => {
-      // Optional: if you wish to sync back scroll of preview to input, uncomment:
-      // const ratio = preview.scrollTop / (preview.scrollHeight - preview.clientHeight);
-      // input.scrollTop = ratio * (input.scrollHeight - input.clientHeight);
-    });
     
     exportBtn.addEventListener('click', exportScript);
-    importBtn.addEventListener('click', () => {
-      importFile.click();
-    });
+    importBtn.addEventListener('click', () => { importFile.click(); });
     importFile.addEventListener('change', (e) => {
       if (e.target.files && e.target.files[0]) {
         importScript(e.target.files[0]);
@@ -359,7 +359,7 @@ Sometimes I wonder if the dog has it easier.
     });
     darkModeToggle.addEventListener('click', toggleDarkMode);
     
-    // Initial render
+    // Initial render.
     updatePreview();
     updateLineNumbers();
   </script>
