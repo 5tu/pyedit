@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pylon Screenwriting</title>
+  <title>Professional Fountain Editor</title>
   <style>
     /* ===== BASE LAYOUT ===== */
     body {
@@ -16,20 +16,19 @@
       position: relative; /* For floating buttons */
       transition: background 0.3s, color 0.3s;
     }
-    /* Dark mode */
     body.dark-mode {
       background: #1e1e1e;
       color: #ccc;
     }
-    
-    /* ===== PREVIEW (LEFT - 66%) ===== */
+
+    /* ===== PREVIEW (Left Pane - 66%) ===== */
     #preview {
       width: 66%;
       padding: 2.5cm 2.5cm;
       overflow-y: auto;
-      background: #fff;
+      background: white;
       box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
-      line-height: 1.2;
+      line-height: 1.4;
       font-size: 12pt;
       white-space: pre-wrap;
       box-sizing: border-box;
@@ -41,7 +40,7 @@
       box-shadow: inset 0 0 5px rgba(255,255,255,0.1);
     }
 
-    /* ===== INPUT (RIGHT - 34%) ===== */
+    /* ===== INPUT (Right Pane - 34%) ===== */
     #inputContainer {
       width: 34%;
       display: flex;
@@ -106,98 +105,55 @@
     .btn:hover {
       background: #0055aa;
     }
-    #exportBtn {
-      bottom: 20px;
-      right: 20px;
-    }
-    #importBtn {
-      bottom: 20px;
-      right: 150px;
-    }
-    #darkModeToggle {
-      bottom: 20px;
-      left: 20px;
-    }
-    /* Hide the default file input */
-    #importFile {
-      display: none;
-    }
+    #exportBtn { bottom: 20px; right: 20px; }
+    #importBtn { bottom: 20px; right: 150px; }
+    #darkModeToggle { bottom: 20px; left: 20px; }
+    /* Hide default file input */
+    #importFile { display: none; }
 
-    /* ===== STRICT SCREENPLAY FORMATTING & SYNTAX HIGHLIGHTING ===== */
-    .scene-heading {
-      font-weight: bold;
-      text-transform: uppercase;
-      margin: 1.2em 0 0.6em 0;
-      padding: 0;
-      width: 100%;
-      color: #0055aa;
-    }
-    .action {
-      margin: 0 0 0.8em 0;
-      width: 100%;
-      padding-right: 2cm;
-      color: #000;
-    }
-    .character {
-      margin: 1em 0 0 4.2cm;
-      font-weight: bold;
-      width: 7cm;
-      color: #333;
-    }
-    .dialogue {
-      margin: 0 0 0 2.8cm;
-      width: 9cm;
-      padding-right: 2cm;
-      color: #111;
-    }
-    .parenthetical {
-      margin: 0 0 0 3.5cm;
-      width: 6cm;
-      font-style: italic;
-      padding-right: 2cm;
-      color: #666;
-    }
-    .transition {
-      margin: 1em 0 0 0;
-      text-align: right;
-      padding-right: 2cm;
-      font-weight: bold;
-      text-transform: uppercase;
-      color: #aa5500;
-    }
-    /* Blank line helper */
-    .blank-line {
-      margin: 0;
-      min-height: 1.2em;
-    }
+    /* ===== FOUNTAIN ELEMENT STYLING ===== */
+    /* Title Page */
+    .title-page { text-align: center; margin-top: 4em; font-size: 14pt; font-weight: bold; }
+    /* Section Headers (# ...) */
+    .section { font-weight: bold; margin-top: 1em; text-decoration: underline; }
+    /* Synopsis (= ...) */
+    .synopsis { font-style: italic; color: #666; margin-top: 0.5em; }
+    /* Notes (// note) */
+    .note { color: #999; font-style: italic; margin: 0.5em 0; padding-left: 1em; border-left: 2px solid #ccc; }
+    /* Centered text (> ... <) */
+    .centered { text-align: center; margin: 1em 0; font-size: 12pt; font-style: italic; }
+    /* Page break (===) */
+    .page-break { border-top: 2px dashed #ccc; margin: 1em 0; }
+
+    /* Fountain body elements */
+    .scene-heading { font-weight: bold; text-transform: uppercase; margin: 1.2em 0 0.5em; color: #0055aa; }
+    .action { margin: 0 0 1em; }
+    .character { margin: 1em 0 0 4cm; font-weight: bold; }
+    .parenthetical { font-style: italic; margin-left: 3.5cm; }
+    .dialogue { margin: 0 0 0 2.8cm; width: 9cm; }
+    .transition { text-align: right; font-weight: bold; text-transform: uppercase; margin-top: 1em; color: #aa5500; }
+    .lyrics { margin-left: 2.5cm; font-style: italic; }
     
-    body.dark-mode .scene-heading { color: #88bfff; }
-    body.dark-mode .action { color: #fff; }
-    body.dark-mode .character { color: #ddd; }
-    body.dark-mode .dialogue { color: #eee; }
-    body.dark-mode .parenthetical { color: #bbb; }
-    body.dark-mode .transition { color: #ffcc99; }
-    
-    /* Import font */
-    @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+    /* Inline formatting helpers */
+    .bold { font-weight: bold; }
+    .italic { font-style: italic; }
+    .bolditalic { font-weight: bold; font-style: italic; }
   </style>
 </head>
 <body>
-  <!-- Preview -->
-  <div id="preview">Type in the editor to see a properly formatted screenplay preview...</div>
-  
-  <!-- Input container with line numbers & textarea -->
+  <!-- Preview Pane -->
+  <div id="preview">Type in the editor to see your screenplay preview...</div>
+
+  <!-- Input Pane with Line Numbers and Textarea -->
   <div id="inputContainer">
     <div id="lineNumbers">1</div>
-    <textarea id="fountainInput" placeholder="INT. LOCATION - DAY
+    <textarea id="fountainInput" placeholder="TITLE: My Screenplay
+CREDIT: Written By
+AUTHOR: John Doe
 
-Character action...
+# Act One
 
-CHARACTER
-(parenthetical)
-Dialogue...
-
-CUT TO:">INT. COFFEE SHOP - DAY
+INT. COFFEE SHOP - DAY
 
 John sits alone, the steam from his coffee swirling in the morning light.
 
@@ -205,7 +161,9 @@ JOHN
 (sighing)
 Another day, another script to format.
 
-He rubs his eyes, then continues typing.
+>Centered Text Example<
+
+[[This is a note about the action.]]
 
 CUT TO:
 
@@ -215,102 +173,206 @@ A lone dog runs across the grass.
 
 JOHN (V.O.)
 Sometimes I wonder if the dog has it easier.
+===
+
+FADE OUT">TITLE: My Screenplay
+CREDIT: Written By
+AUTHOR: John Doe
+
+# Act One
+
+INT. COFFEE SHOP - DAY
+
+John sits alone, the steam from his coffee swirling in the morning light.
+
+JOHN
+(sighing)
+Another day, another script to format.
+
+>Centered Text Example<
+
+[[This is a note about the action.]]
+
+CUT TO:
+
+EXT. PARK - SUNSET
+
+A lone dog runs across the grass.
+
+JOHN (V.O.)
+Sometimes I wonder if the dog has it easier.
+===
+FADE OUT
     </textarea>
   </div>
 
-  <!-- Buttons -->
+  <!-- Buttons and hidden file input -->
   <button id="exportBtn" class="btn">Export .fountain</button>
   <button id="importBtn" class="btn">Import .fountain</button>
   <button id="darkModeToggle" class="btn">Toggle Dark Mode</button>
-  <input type="file" id="importFile" accept=".fountain,.txt" />
+  <input type="file" id="importFile" accept=".fountain,.txt">
 
   <script>
     const input = document.getElementById('fountainInput');
     const preview = document.getElementById('preview');
+    const lineNumbers = document.getElementById('lineNumbers');
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
     const importFile = document.getElementById('importFile');
     const darkModeToggle = document.getElementById('darkModeToggle');
-    const lineNumbers = document.getElementById('lineNumbers');
 
-    // Parse Fountain text into formatted HTML blocks.
+    // Helper: escape HTML entities
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, m => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m]));
+    }
+
+    // Apply inline styling for **bold**, _italic_ and ***bold italic***
+    function stylize(line) {
+      return line
+        .replace(/\*\*\*(.+?)\*\*\*/g, '<span class="bolditalic">$1</span>')
+        .replace(/\*\*(.+?)\*\*/g, '<span class="bold">$1</span>')
+        .replace(/_(.+?)_/g, '<span class="italic">$1</span>');
+    }
+
+    // Comprehensive Fountain parser covering most syntax as per fountain.io
     function parseFountain(text) {
       const lines = text.split('\n');
       let html = '';
-      let inDialogue = false;
-      
+      let inDialog = false;
+      let inBoneyard = false;
+
       for (let i = 0; i < lines.length; i++) {
-        // Use the raw line (do not trim) so blank lines stay empty.
-        const rawLine = lines[i];
-        const line = rawLine.trim();
-        const prevLine = i > 0 ? lines[i-1].trim() : '';
-        
-        if (rawLine === "") {
-          // Use a div with fixed line height for blank lines.
-          html += `<div class="blank-line">&nbsp;</div>`;
-          inDialogue = false;
+        let raw = lines[i];
+        let line = raw;
+        // Do inline formatting before trimming, but escape after:
+        line = stylize(raw);
+        let trimmed = line.trim();
+
+        // Boneyard: ignore lines within /* ... */
+        if (trimmed.startsWith('/*')) { inBoneyard = true; continue; }
+        if (trimmed.endsWith('*/')) { inBoneyard = false; continue; }
+        if (inBoneyard) continue;
+
+        // Blank line: output a break so line numbering stays in sync.
+        if (trimmed === "") {
+          html += '<br>';
+          inDialog = false;
           continue;
         }
 
-        // Scene Headings (starting with INT., EXT., EST., I/E.)
-        if (/^(INT|EXT|EST|I\/E)[\.:]? .+/i.test(line)) {
-          html += `<div class="scene-heading">${line.toUpperCase()}</div>`;
-          inDialogue = false;
-        } 
-        // Transitions (e.g., CUT TO:, FADE IN:, FADE OUT:, DISSOLVE TO:)
-        else if (/^(FADE (IN|OUT|TO):?|CUT TO:?|DISSOLVE TO:?)$/i.test(line)) {
-          html += `<div class="transition">${line.toUpperCase()}</div>`;
-          inDialogue = false;
+        // Title Page (assume they are at the very beginning)
+        if (/^(title|credit|author|draft date|date|contact):/i.test(trimmed)) {
+          html += `<div class="title-page">${escapeHTML(trimmed)}</div>`;
+          continue;
         }
-        // Character (all uppercase, may include numbers and punctuation, and preceded by a blank line or at the very start)
-        else if (/^[A-Z0-9 .()'’\-]+$/.test(line) && (i === 0 || prevLine === '')) {
-          html += `<div class="character">${line}</div>`;
-          inDialogue = true;
+        
+        // Section Headers (lines starting with one or more "#")
+        if (/^#+\s+/.test(trimmed)) {
+          html += `<div class="section">${escapeHTML(trimmed.replace(/^#+\s+/, ''))}</div>`;
+          inDialog = false;
+          continue;
         }
+        
+        // Synopsis (lines starting with "=")
+        if (/^=\s+/.test(trimmed)) {
+          html += `<div class="synopsis">${escapeHTML(trimmed.slice(1).trim())}</div>`;
+          inDialog = false;
+          continue;
+        }
+        
+        // Notes (lines beginning with [[ and ending with ]])
+        if (/^\[\[(.+?)\]\]$/.test(trimmed)) {
+          let match = trimmed.match(/^\[\[(.+?)\]\]$/);
+          html += `<div class="note">${escapeHTML(match[1])}</div>`;
+          inDialog = false;
+          continue;
+        }
+        
+        // Centered text (lines that start with ">" and end with "<")
+        if (/^>.*<$/.test(trimmed)) {
+          html += `<div class="centered">${escapeHTML(trimmed.slice(1, -1).trim())}</div>`;
+          inDialog = false;
+          continue;
+        }
+        
+        // Page Break (a line of three or more "=")
+        if (/^={3,}$/.test(trimmed)) {
+          html += `<div class="page-break"></div>`;
+          inDialog = false;
+          continue;
+        }
+        
+        // Scene Heading (lines starting with INT./EXT./EST./I/E.)
+        if (/^(INT\.|EXT\.|EST\.|I\/E\.)/.test(trimmed)) {
+          html += `<div class="scene-heading">${escapeHTML(trimmed)}</div>`;
+          inDialog = false;
+          continue;
+        }
+        
+        // Transition (e.g., CUT TO:, FADE IN:, FADE OUT:, etc.)
+        if (/^(FADE (TO BLACK|IN|OUT)|CUT TO:|DISSOLVE TO:|SMASH CUT TO:|WIPE TO:|TO:)$/.test(trimmed)) {
+          html += `<div class="transition">${escapeHTML(trimmed)}</div>`;
+          inDialog = false;
+          continue;
+        }
+        
+        // Character (lines in all uppercase, optionally with (V.O.) or (O.S.), and preceded by a blank line)
+        if (/^[A-Z0-9 ()'.\-]+$/.test(trimmed) && (i === 0 || lines[i-1].trim() === "")) {
+          html += `<div class="character">${escapeHTML(trimmed)}</div>`;
+          inDialog = true;
+          continue;
+        }
+        
         // Parenthetical (within dialogue)
-        else if (/^\(.+\)$/.test(line) && inDialogue) {
-          html += `<div class="parenthetical">${line}</div>`;
+        if (/^\(.*\)$/.test(trimmed) && inDialog) {
+          html += `<div class="parenthetical">${escapeHTML(trimmed)}</div>`;
+          continue;
         }
-        // Dialogue (if in dialogue block)
-        else if (inDialogue) {
-          html += `<div class="dialogue">${line}</div>`;
+        
+        // Lyrics (lines starting with "~")
+        if (/^~/.test(trimmed)) {
+          html += `<div class="lyrics">${escapeHTML(trimmed.slice(1).trim())}</div>`;
+          continue;
         }
-        // Otherwise, treat it as Action.
-        else {
-          html += `<div class="action">${line}</div>`;
-          inDialogue = false;
+        
+        // Dialogue (if in a dialogue block)
+        if (inDialog) {
+          html += `<div class="dialogue">${escapeHTML(trimmed)}</div>`;
+          continue;
         }
+        
+        // Fallback Action
+        html += `<div class="action">${escapeHTML(trimmed)}</div>`;
+        inDialog = false;
       }
-      
       return html || '<div class="action">/* Script preview will appear here */</div>';
     }
 
-    // Update the preview pane with parsed Fountain content.
+    // Update preview pane with parsed Fountain content
     function updatePreview() {
       preview.innerHTML = parseFountain(input.value);
     }
 
-    // Update line numbers based on the current number of lines in the textarea.
+    // Update line numbers based on number of lines in the textarea
     function updateLineNumbers() {
-      const lines = input.value.split('\n').length;
+      const totalLines = input.value.split('\n').length;
       let numbersHTML = '';
-      for (let i = 1; i <= lines; i++) {
+      for (let i = 1; i <= totalLines; i++) {
         numbersHTML += i + '<br>';
       }
       lineNumbers.innerHTML = numbersHTML;
     }
 
-    // Sync scroll positions between textarea, preview, and line numbers.
+    // Sync scroll positions between input, preview, and line numbers
     function syncScroll() {
       const ratio = input.scrollTop / (input.scrollHeight - input.clientHeight);
       preview.scrollTop = ratio * (preview.scrollHeight - preview.clientHeight);
       lineNumbers.scrollTop = input.scrollTop;
     }
-    
-    // Export the Fountain script as a .fountain file.
+
+    // Export Fountain script as a .fountain file
     function exportScript() {
-      const content = input.value;
-      const blob = new Blob([content], { type: 'text/plain' });
+      const blob = new Blob([input.value], {type: 'text/plain'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -320,8 +382,8 @@ Sometimes I wonder if the dog has it easier.
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
-    
-    // Import a Fountain script from a file.
+
+    // Import Fountain script from file
     function importScript(file) {
       const reader = new FileReader();
       reader.onload = (evt) => {
@@ -331,35 +393,33 @@ Sometimes I wonder if the dog has it easier.
       };
       reader.readAsText(file);
     }
-    
-    // Toggle dark mode by toggling a class on the body.
+
+    // Toggle dark mode
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
     }
-    
-    // Event listeners.
+
+    // Event listeners
     input.addEventListener('input', () => {
       updatePreview();
       updateLineNumbers();
     });
     input.addEventListener('paste', () => {
-      setTimeout(() => { // delay to allow paste to complete.
+      setTimeout(() => {
         updatePreview();
         updateLineNumbers();
       }, 0);
     });
     input.addEventListener('scroll', syncScroll);
-    
     exportBtn.addEventListener('click', exportScript);
     importBtn.addEventListener('click', () => { importFile.click(); });
     importFile.addEventListener('change', (e) => {
-      if (e.target.files && e.target.files[0]) {
+      if (e.target.files && e.target.files[0])
         importScript(e.target.files[0]);
-      }
     });
     darkModeToggle.addEventListener('click', toggleDarkMode);
-    
-    // Initial render.
+
+    // Initial rendering
     updatePreview();
     updateLineNumbers();
   </script>
