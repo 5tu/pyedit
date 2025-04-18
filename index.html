@@ -1,81 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Professional Fountain Editor</title>
+  <title>Screenplay</title>
   <style>
     /* ===== BASE LAYOUT ===== */
     body {
       display: flex;
       margin: 0;
       height: 100vh;
-      font-family: "Courier Prime", Courier, monospace;
+      font-family: "Courier Prime Code", Courier, monospace; /* Change to Courier Prime Code */
       overflow: hidden;
-      background: #f5f5f5;
-      position: relative; /* For floating buttons */
+      background: #f5f5dc; /* Subtle beige for light mode */
+      color: #333; /* Darker text for contrast */
+      position: relative;
+      /* For floating buttons */
       transition: background 0.3s, color 0.3s;
     }
-    body.dark-mode {
-      background: #1e1e1e;
-      color: #ccc;
-    }
 
-    /* ===== PREVIEW (Left Pane - 66%) ===== */
+    /* ===== PREVIEW (Left Pane - ISO A Series Ratio) ===== */
     #preview {
-      width: 66%;
-      padding: 2.5cm 2.5cm;
+      flex: 0 0 auto; /* Prevent flex-grow */
+      width: calc(100vh / 1.4142); /* Set width based on 1:1.4142 aspect ratio */
+      height: 100%; /* Full height of the viewport */
+      padding: 2.5cm; /* Use cm to match A4 proportions */
       overflow-y: auto;
-      background: white;
-      box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+      background: url('images/paper.jpg') repeat; /* Use paper.jpg as tiled background */
+      color: #333; /* Darker text */
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
       line-height: 1.4;
-      font-size: 12pt;
+      font-size: calc((100vh / 1.4142) / 210 * 12); /* Scale font size to match 12pt on A4 paper */
       white-space: pre-wrap;
       box-sizing: border-box;
       transition: background 0.3s, color 0.3s;
-    }
-    body.dark-mode #preview {
-      background: #333;
-      color: #eee;
-      box-shadow: inset 0 0 5px rgba(255,255,255,0.1);
+      font-family: "Courier Prime", Courier, monospace; /* Change to Courier Prime */
     }
 
-    /* ===== INPUT (Right Pane - 34%) ===== */
+    /* Title block styling for the preview */
+    .title-box {
+      background: url('images/paper.jpg') repeat; /* Match preview background */
+      color: #333; /* Match preview text color */
+      border: 1px solid red; /* Red border */
+      padding: 10px; /* Padding for the box */
+      margin-bottom: 20px; /* Space below the box */
+      box-sizing: border-box;
+    }
+
+    /* ===== INPUT (Right Pane - Remaining Space) ===== */
     #inputContainer {
-      width: 34%;
+      flex: 1; /* Take up the remaining space */
       display: flex;
-      flex-direction: row;
+      flex-direction: column; /* Adjusted to remove line numbers */
       border-left: 1px solid #e0e0e0;
       box-sizing: border-box;
       background: #fafafa;
       transition: background 0.3s, color 0.3s;
     }
-    body.dark-mode #inputContainer {
-      background: #444;
-    }
-    /* Line numbers panel */
-    #lineNumbers {
-      width: 40px;
-      padding: 1.5cm 0.5cm 1.5cm 0.5cm;
-      background: #eaeaea;
-      text-align: right;
-      color: #666;
-      font-size: 12pt;
-      line-height: 1.2;
-      box-sizing: border-box;
-      user-select: none;
-      overflow: hidden;
-    }
-    body.dark-mode #lineNumbers {
-      background: #555;
-      color: #bbb;
-    }
-    /* Textarea (changed font to Arial, sans-serif) */
+
+    /* Textarea */
     #fountainInput {
       flex: 1;
       padding: 1.5cm;
       border: none;
-      font-family: Arial, sans-serif;
+      font-family: "Courier Prime Code", Courier, monospace; /* Change to Courier Prime Code */
       font-size: 12pt;
       line-height: 1.2;
       resize: none;
@@ -83,147 +72,232 @@
       background: inherit;
       color: inherit;
       box-sizing: border-box;
-      overflow-y: auto; /* Vertical scroll only */
+      overflow-y: scroll; /* Enable scrolling */
       overflow-x: hidden; /* Prevent horizontal scroll */
+      white-space: pre-wrap; /* Allow text wrapping */
+      word-wrap: break-word; /* Break long words */
+      scrollbar-width: none; /* Hide scrollbar for Firefox */
+    }
+
+    #fountainInput::-webkit-scrollbar {
+      display: none; /* Hide scrollbar for WebKit browsers */
+    }
+
+    /* Adjust styles for line numbers with wrapping */
+    .wrapped-line {
+      color: #aaa; /* Different color for wrapped lines */
     }
 
     /* ===== BUTTONS ===== */
     .btn {
-      position: fixed;
-      padding: 10px 15px;
-      background: #0066cc;
-      color: white;
-      border: none;
-      border-radius: 4px;
+      position: relative; /* Adjust position relative to the container */
+      width: 40px; /* Set button size */
+      height: 40px;
+      background: none; /* Remove background */
+      border: none; /* Remove border */
       cursor: pointer;
-      font-family: sans-serif;
-      font-size: 14px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      transition: background 0.3s;
-      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.5; /* Set default opacity */
+      transition: opacity 0.3s, filter 0.3s; /* Smooth transition for hover effects */
     }
+
     .btn:hover {
-      background: #0055aa;
+      opacity: 1; /* Full opacity on hover */
     }
-    #exportBtn { bottom: 20px; right: 20px; }
-    #importBtn { bottom: 20px; right: 150px; }
-    #darkModeToggle { bottom: 20px; left: 20px; }
-    /* Hide default file input */
-    #importFile { display: none; }
+
+    .btn img {
+      width: 100%; /* Make the image fill the button */
+      height: auto;
+      filter: none; /* Default color */
+      transition: filter 0.3s; /* Smooth transition for hover effects */
+    }
+
+    #exportBtn img {
+      transform: rotate(180deg); /* Rotate export button image */
+    }
+
+    .btn:hover img {
+      filter: invert(21%) sepia(91%) saturate(747%) hue-rotate(226deg) brightness(91%) contrast(91%); /* Change color to #171796 */
+    }
+
+    .button-container {
+      position: absolute;
+      top: 10px; /* Align container at the top */
+      left: 50%; /* Center horizontally */
+      transform: translateX(-50%); /* Adjust for centering */
+      display: flex;
+      gap: 20px; /* Add spacing between buttons */
+    }
+
+    /* Hide the file input */
+    #importFile {
+      display: none;
+    }
 
     /* ===== FOUNTAIN ELEMENT STYLING ===== */
     /* Title Page */
-    .title-page { text-align: center; margin-top: 4em; font-size: 14pt; font-weight: bold; }
+    .title-page {
+      text-align: center;
+      margin-top: 4em;
+      font-size: 14pt;
+      font-weight: bold;
+    }
+
     /* Section Headers (# ...) */
-    .section { font-weight: bold; margin-top: 1em; text-decoration: underline; }
+    .section {
+      font-weight: bold;
+      margin-top: 1em;
+      text-decoration: underline;
+    }
+
     /* Synopsis (= ...) */
-    .synopsis { font-style: italic; color: #666; margin-top: 0.5em; }
+    .synopsis {
+      font-style: italic;
+      color: #666;
+      margin-top: 0.5em;
+    }
+
     /* Notes (// note) */
-    .note { color: #999; font-style: italic; margin: 0.5em 0; padding-left: 1em; border-left: 2px solid #ccc; }
+    .note {
+      color: #999;
+      font-style: italic;
+      margin: 0.5em 0;
+      padding-left: 1em;
+      border-left: 2px solid #ccc;
+    }
+
     /* Centered text (> ... <) */
-    .centered { text-align: center; margin: 1em 0; font-size: 12pt; font-style: italic; }
+    .centered {
+      text-align: center;
+      margin: 1em 0;
+      font-size: 12pt;
+      font-style: italic;
+    }
+
     /* Page break (===) */
-    .page-break { border-top: 2px dashed #ccc; margin: 1em 0; }
+    .page-break {
+      border-top: 2px dashed #ccc;
+      margin: 1em 0;
+    }
 
     /* Fountain body elements */
-    .scene-heading { font-weight: bold; text-transform: uppercase; margin: 1.2em 0 0.5em; color: #0055aa; }
-    .action { margin: 0 0 1em; }
-    .character { margin: 1em 0 0 4cm; font-weight: bold; }
-    .parenthetical { font-style: italic; margin-left: 3.5cm; }
-    .dialogue { margin: 0 0 0 2.8cm; width: 9cm; }
-    .transition { text-align: right; font-weight: bold; text-transform: uppercase; margin-top: 1em; color: #aa5500; }
-    .lyrics { margin-left: 2.5cm; font-style: italic; }
-    
+    .scene-heading {
+      font-weight: bold;
+      text-transform: uppercase;
+      margin: 1.2em 0 0.5em;
+      color: #171796; /* Change scene heading color */
+    }
+
+    .action {
+      margin: 0 0 1em;
+    }
+
+    .character {
+      margin: 1em 0 0 4cm;
+      font-weight: bold;
+    }
+
+    .parenthetical {
+      font-style: italic;
+      margin-left: 3.5cm;
+    }
+
+    .dialogue {
+      margin: 0 0 0 2.8cm;
+      width: 9cm;
+    }
+
+    .transition {
+      text-align: right;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-top: 1em;
+      color: #aa5500;
+    }
+
+    .lyrics {
+      margin-left: 2.5cm;
+      font-style: italic;
+    }
+
     /* Inline formatting helpers */
-    .bold { font-weight: bold; }
-    .italic { font-style: italic; }
-    .bolditalic { font-weight: bold; font-style: italic; }
+    .bold {
+      font-weight: bold;
+    }
+
+    .italic {
+      font-style: italic;
+    }
+
+    .bolditalic {
+      font-weight: bold;
+      font-style: italic;
+    }
+
+    /* ===== SCROLLBAR STYLING ===== */
+    /* Light mode scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #171796; /* Change scrollbar thumb color */
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #0f0f5c; /* Slightly darker on hover */
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f5f5dc; /* Subtle beige for light mode */
+    }
   </style>
 </head>
+
 <body>
   <!-- Preview Pane -->
-  <div id="preview">Type in the editor to see your screenplay preview...</div>
+  <div id="preview">Start typing in the editor pane over there...</div>
 
-  <!-- Input Pane with Line Numbers and Textarea -->
+  <!-- Input Pane with Textarea -->
   <div id="inputContainer">
-    <div id="lineNumbers">1</div>
-    <textarea id="fountainInput" placeholder="TITLE: My Screenplay
-CREDIT: Written By
-AUTHOR: John Doe
-
-# Act One
-
-INT. COFFEE SHOP - DAY
-
-John sits alone, the steam from his coffee swirling in the morning light.
-
-JOHN
-(sighing)
-Another day, another script to format.
-
->Centered Text Example<
-
-[[This is a note about the action.]]
-
-CUT TO:
-
-EXT. PARK - SUNSET
-
-A lone dog runs across the grass.
-
-JOHN (V.O.)
-Sometimes I wonder if the dog has it easier.
-===
-
-FADE OUT">TITLE: My Screenplay
-CREDIT: Written By
-AUTHOR: John Doe
-
-# Act One
-
-INT. COFFEE SHOP - DAY
-
-John sits alone, the steam from his coffee swirling in the morning light.
-
-JOHN
-(sighing)
-Another day, another script to format.
-
->Centered Text Example<
-
-[[This is a note about the action.]]
-
-CUT TO:
-
-EXT. PARK - SUNSET
-
-A lone dog runs across the grass.
-
-JOHN (V.O.)
-Sometimes I wonder if the dog has it easier.
-===
-FADE OUT
+    <textarea id="fountainInput" placeholder="Write your screenplay here...">
     </textarea>
   </div>
 
   <!-- Buttons and hidden file input -->
-  <button id="exportBtn" class="btn">Export .fountain</button>
-  <button id="importBtn" class="btn">Import .fountain</button>
-  <button id="darkModeToggle" class="btn">Toggle Dark Mode</button>
-  <input type="file" id="importFile" accept=".fountain,.txt">
+  <div class="button-container">
+    <button id="exportBtn" class="btn">
+      <img src="images/arrow.svg" alt="Export">
+    </button>
+    <button id="importBtn" class="btn">
+      <img src="images/arrow.svg" alt="Import">
+    </button>
+    <button id="settingsBtn" class="btn">
+      <img src="images/gear.svg" alt="Settings">
+    </button>
+  </div>
+  <input type="file" id="importFile" accept=".fountain">
 
   <script>
     const input = document.getElementById('fountainInput');
     const preview = document.getElementById('preview');
-    const lineNumbers = document.getElementById('lineNumbers');
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
     const importFile = document.getElementById('importFile');
-    const darkModeToggle = document.getElementById('darkModeToggle');
 
     // Helper: escape HTML entities
     function escapeHTML(str) {
-      return str.replace(/[&<>"']/g, m => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m]));
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[m]));
     }
 
     // Apply inline styling for **bold**, _italic_ and ***bold italic***
@@ -234,43 +308,69 @@ FADE OUT
         .replace(/_(.+?)_/g, '<span class="italic">$1</span>');
     }
 
-    // Comprehensive Fountain parser (same as your last working version)
+    // Comprehensive Fountain parser
     function parseFountain(text) {
       const lines = text.split('\n');
       let html = '';
       let inDialog = false;
       let inBoneyard = false;
+      let hasTitlePage = false;
+      let inAddress = false;
+
       for (let i = 0; i < lines.length; i++) {
         let raw = lines[i];
         let line = stylize(raw);
         let trimmed = line.trim();
+
+        // Title Page
+        if (/^(title|credit|author|draft date|date|contact):/i.test(trimmed)) {
+          hasTitlePage = true;
+          if (/^contact:/i.test(trimmed)) {
+            inAddress = true; // Start capturing the address
+          }
+          continue;
+        }
+
+        // Address (lines following "contact:")
+        if (inAddress) {
+          if (trimmed === '') {
+            inAddress = false; // End of address when a blank line is encountered
+          }
+          continue;
+        }
+
         // Boneyard: ignore lines within /* ... */
-        if (trimmed.startsWith('/*')) { inBoneyard = true; continue; }
-        if (trimmed.endsWith('*/')) { inBoneyard = false; continue; }
+        if (trimmed.startsWith('/*')) {
+          inBoneyard = true;
+          continue;
+        }
+        if (trimmed.endsWith('*/')) {
+          inBoneyard = false;
+          continue;
+        }
         if (inBoneyard) continue;
+
         // Blank line
         if (trimmed === "") {
           html += '<br>';
           inDialog = false;
           continue;
         }
-        // Title Page
-        if (/^(title|credit|author|draft date|date|contact):/i.test(trimmed)) {
-          html += `<div class="title-page">${escapeHTML(trimmed)}</div>`;
-          continue;
-        }
+
         // Section Headers (# ...)
         if (/^#+\s+/.test(trimmed)) {
           html += `<div class="section">${escapeHTML(trimmed.replace(/^#+\s+/, ''))}</div>`;
           inDialog = false;
           continue;
         }
+
         // Synopsis (= ...)
         if (/^=\s+/.test(trimmed)) {
           html += `<div class="synopsis">${escapeHTML(trimmed.slice(1).trim())}</div>`;
           inDialog = false;
           continue;
         }
+
         // Notes ([[ ... ]])
         if (/^\[\[(.+?)\]\]$/.test(trimmed)) {
           let match = trimmed.match(/^\[\[(.+?)\]\]$/);
@@ -278,55 +378,69 @@ FADE OUT
           inDialog = false;
           continue;
         }
+
         // Centered text (> ... <)
         if (/^>.*<$/.test(trimmed)) {
           html += `<div class="centered">${escapeHTML(trimmed.slice(1, -1).trim())}</div>`;
           inDialog = false;
           continue;
         }
+
         // Page Break (===)
         if (/^={3,}$/.test(trimmed)) {
           html += `<div class="page-break"></div>`;
           inDialog = false;
           continue;
         }
+
         // Scene Heading (INT./EXT./EST./I/E.)
         if (/^(INT\.|EXT\.|EST\.|I\/E\.)/.test(trimmed)) {
           html += `<div class="scene-heading">${escapeHTML(trimmed)}</div>`;
           inDialog = false;
           continue;
         }
+
         // Transition (e.g., CUT TO:, FADE IN:, FADE OUT:, etc.)
         if (/^(FADE (TO BLACK|IN|OUT)|CUT TO:|DISSOLVE TO:|SMASH CUT TO:|WIPE TO:|TO:)$/.test(trimmed)) {
           html += `<div class="transition">${escapeHTML(trimmed)}</div>`;
           inDialog = false;
           continue;
         }
+
         // Character (all uppercase, optionally with (V.O.) or (O.S.), preceded by a blank line)
-        if (/^[A-Z0-9 ()'.\-]+$/.test(trimmed) && (i === 0 || lines[i-1].trim() === "")) {
+        if (/^[A-Z0-9 ()'.\-]+$/.test(trimmed) && (i === 0 || lines[i - 1].trim() === "")) {
           html += `<div class="character">${escapeHTML(trimmed)}</div>`;
           inDialog = true;
           continue;
         }
+
         // Parenthetical (within dialogue)
         if (/^\(.*\)$/.test(trimmed) && inDialog) {
           html += `<div class="parenthetical">${escapeHTML(trimmed)}</div>`;
           continue;
         }
-        // Lyrics (lines starting with "~")
+
+        // Lyrics (lines starting with ~)
         if (/^~/.test(trimmed)) {
           html += `<div class="lyrics">${escapeHTML(trimmed.slice(1).trim())}</div>`;
           continue;
         }
+
         // Dialogue (if in a dialogue block)
         if (inDialog) {
           html += `<div class="dialogue">${escapeHTML(trimmed)}</div>`;
           continue;
         }
+
         // Fallback Action
         html += `<div class="action">${escapeHTML(trimmed)}</div>`;
         inDialog = false;
       }
+
+      if (hasTitlePage) {
+        html = `<div class="title-box">Fountain includes title page elements</div>` + html;
+      }
+
       return html || '<div class="action">/* Script preview will appear here */</div>';
     }
 
@@ -335,30 +449,25 @@ FADE OUT
       preview.innerHTML = parseFountain(input.value);
     }
 
-    // Update line numbers
-    function updateLineNumbers() {
-      const totalLines = input.value.split('\n').length;
-      let numbersHTML = '';
-      for (let i = 1; i <= totalLines; i++) {
-        numbersHTML += i + '<br>';
-      }
-      lineNumbers.innerHTML = numbersHTML;
-    }
+    // Sync scroll positions between input and preview
+    function syncScroll(event) {
+      const source = event.target;
+      const target = source === input ? preview : input;
 
-    // Sync scroll positions
-    function syncScroll() {
-      const ratio = input.scrollTop / (input.scrollHeight - input.clientHeight);
-      preview.scrollTop = ratio * (preview.scrollHeight - preview.clientHeight);
-      lineNumbers.scrollTop = input.scrollTop;
+      // Calculate the scroll ratio based on the source's scroll position
+      const ratio = source.scrollTop / (source.scrollHeight - source.clientHeight);
+
+      // Apply the same ratio to the target's scroll position
+      target.scrollTop = Math.round(ratio * (target.scrollHeight - target.clientHeight));
     }
 
     // Export Fountain script as a .fountain file
     function exportScript() {
-      const blob = new Blob([input.value], {type: 'text/plain'});
+      const blob = new Blob([input.value], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `screenplay_${new Date().toISOString().slice(0,10)}.fountain`;
+      a.download = `screenplay_${new Date().toISOString().slice(0, 10)}.fountain`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -371,39 +480,34 @@ FADE OUT
       reader.onload = (evt) => {
         input.value = evt.target.result;
         updatePreview();
-        updateLineNumbers();
       };
       reader.readAsText(file);
     }
 
-    // Toggle dark mode
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
+    // Initialize the application
+    function initializeApp() {
+      updatePreview();
     }
 
     // Event listeners
-    input.addEventListener('input', () => {
-      updatePreview();
-      updateLineNumbers();
-    });
+    input.addEventListener('input', updatePreview);
     input.addEventListener('paste', () => {
-      setTimeout(() => {
-        updatePreview();
-        updateLineNumbers();
-      }, 0);
+      setTimeout(updatePreview, 0);
     });
     input.addEventListener('scroll', syncScroll);
+    preview.addEventListener('scroll', syncScroll); // Sync when preview is scrolled
     exportBtn.addEventListener('click', exportScript);
-    importBtn.addEventListener('click', () => { importFile.click(); });
-    importFile.addEventListener('change', (e) => {
-      if (e.target.files && e.target.files[0])
-        importScript(e.target.files[0]);
-    });
-    darkModeToggle.addEventListener('click', toggleDarkMode);
+    importBtn.addEventListener('click', () => importFile.click());
 
-    // Initial rendering
-    updatePreview();
-    updateLineNumbers();
+    importFile.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        importScript(e.target.files[0]);
+      }
+    });
+
+    // Start the application
+    window.addEventListener('DOMContentLoaded', initializeApp);
   </script>
 </body>
+
 </html>
